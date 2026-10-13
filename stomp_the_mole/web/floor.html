@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Stomp the Mole</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+    cursor: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  /* exactly floor-size device pixels at the top-left; floor.js sets the CSS size from devicePixelRatio */
+  #floor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: block;
+    image-rendering: pixelated;
+  }
+</style>
+</head>
+<body>
+<canvas id="floor" width="560" height="448"></canvas>
+<script src="feed.js"></script>
+<script src="audio.js"></script>
+<script src="floor.js"></script>
+</body>
+</html>

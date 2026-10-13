@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mole scoreboard (feed test view)</title>
+<style>
+  :root {
+    --bg: #10131a;
+    --panel: #1b2130;
+    --line: #2c3548;
+    --text: #f4f4f4;
+    --dim: #8d97ab;
+    --yellow: #ffd21a;
+    --orange: #ff9a1f;
+    --green: #6dff4a;
+    --red: #ff4b3a;
+    --font: "Arial Black", "Segoe UI Black", Impact, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); overflow: hidden; }
+  body { display: grid; grid-template-rows: auto minmax(0, 1fr); grid-template-columns: minmax(0, 1fr); gap: 1.5vmin; padding: 2vmin; }
+
+  header { display: flex; align-items: center; gap: 2vmin; font-size: clamp(14px, 3vmin, 40px); }
+  .pill { padding: 0.2em 0.8em; border-radius: 999px; background: var(--line); text-transform: uppercase; }
+  .pill.attract { background: #3557a8; }
+  .pill.countdown { background: var(--orange); color: #000; }
+  .pill.play { background: #2f9e3a; }
+  .pill.results { background: #9b3cc4; }
+  #link { width: 0.7em; height: 0.7em; border-radius: 50%; background: var(--red); }
+  #link.up { background: var(--green); }
+  #event { margin-left: auto; color: var(--dim); }
+  #event b { color: var(--text); }
+  #event.flash b { color: var(--yellow); }
+
+  main { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 2vmin; min-height: 0; }
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: 1.6fr 1fr auto auto; gap: 2vmin; min-height: 0; }
+  .card { background: var(--panel); border-radius: 2vmin; padding: 1.5vmin 2vmin; display: flex; flex-direction: column;
+          justify-content: center; align-items: center; min-height: 0; overflow: hidden; }
+  .card label { color: var(--dim); font-size: clamp(11px, 2.6vmin, 34px); letter-spacing: 0.05em; text-align: center; }
+  .card b { font-size: clamp(28px, 11vmin, 220px); line-height: 1; }
+  .card.time { grid-column: 1 / -1; }
+  .card.time b { font-size: clamp(48px, 24vmin, 400px); }
+  .card.time.warn b { color: var(--red); }
+  .card.score b { color: var(--yellow); }
+  .card.combo b { color: var(--orange); }
+  #result { grid-column: 1 / -1; text-align: center; font-size: clamp(16px, 5vmin, 80px); color: var(--green); min-height: 1.2em; }
+  #result.new { color: var(--yellow); }
+  #extra { grid-column: 1 / -1; text-align: center; color: var(--dim); font-size: clamp(11px, 2vmin, 24px); }
+
+  .table { background: var(--panel); border-radius: 2vmin; padding: 2vmin; display: flex; flex-direction: column; min-height: 0; }
+  .table h2 { margin: 0 0 1vmin; font-size: clamp(16px, 3.6vmin, 56px); color: var(--yellow); text-align: center; }
+  ol { list-style: none; margin: 0; padding: 0; flex: 1; display: grid; grid-template-rows: repeat(10, 1fr); min-height: 0; }
+  li { display: flex; align-items: center; gap: 1.5vmin; font-size: clamp(14px, 3.6vmin, 56px); border-bottom: 1px solid var(--line); }
+  li .rank { width: 1.6em; height: 1.6em; border-radius: 50%; background: #5aa9ff; color: #000; display: grid; place-items: center; font-size: 0.6em; }
+  li:nth-child(1) .rank { background: #ffcf33; }
+  li:nth-child(2) .rank { background: #dfe7ee; }
+  li:nth-child(3) .rank { background: #e8995c; }
+  li .combo { margin-left: auto; color: var(--orange); font-size: 0.6em; }
+  li .when { color: var(--dim); font-size: 0.45em; width: 4.5em; text-align: right; }
+  li.mine { background: rgba(255, 210, 26, 0.25); }
+  .empty { color: var(--dim); text-align: center; margin: auto; font-size: clamp(14px, 3vmin, 40px); }
+
+  #countdown { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, 0.6);
+               font-size: 55vmin; color: var(--yellow); -webkit-text-stroke: 1.2vmin #000; pointer-events: none; }
+  #countdown[hidden] { display: none; }
+  #countdown.go { color: var(--green); font-size: 38vmin; }
+  #countdown span { animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes pop { from { transform: scale(2.2); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  #connecting { position: fixed; inset: 0; display: grid; place-items: center; background: var(--bg); color: var(--dim);
+                font-size: clamp(14px, 3vmin, 32px); }
+  #connecting[hidden] { display: none; }
+
+  @media (max-aspect-ratio: 1/1) {
+    main { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 3fr) minmax(0, 2fr); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <span id="link" title="feed connection"></span>
+  <span id="phase" class="pill">-</span>
+  <span id="event">last event: <b>-</b></span>
+</header>
+<main>
+  <section class="stats">
+    <div class="card time" id="timeCard"><label>TIME LEFT</label><b id="time">--</b></div>
+    <div class="card score"><label>SCORE</label><b id="score">0</b></div>
+    <div class="card combo"><label>COMBO</label><b id="combo">0</b></div>
+    <div class="card best"><label>BEST COMBO</label><b id="best">0</b></div>
+    <div id="result"></div>
+    <div id="extra"></div>
+  </section>
+  <section class="table">
+    <h2 id="topTitle">TODAY'S TOP 10</h2>
+    <ol id="top"></ol>
+  </section>
+</main>
+<div id="countdown" hidden><span id="cdValue"></span></div>
+<div id="connecting">connecting...</div>
+<script src="feed.js"></script>
+<script src="scoreboard.js"></script>
+</body>
+</html>

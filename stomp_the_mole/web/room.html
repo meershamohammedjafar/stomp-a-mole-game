@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Stomp the Mole - Room</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+    cursor: none;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  /* The signage division (2600 x 1820 by default) in device pixels at the page's top-left.
+     room.js sets the size from hello.config.room and the CSS size from devicePixelRatio
+     (or fits it to the window with ?preview=1). */
+  #room {
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="room" width="2600" height="1820"></canvas>
+<script>
+  // Notes every script below that fails to load (load errors do not bubble, but reach a capturing listener).
+  window.__stompFailed = [];
+  window.addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'SCRIPT') window.__stompFailed.push(t.getAttribute('src'));
+  }, true);
+</script>
+<script src="feed.js"></script>
+<script src="sky.js"></script>
+<script src="room.js"></script>
+<script>
+  /* Load watchdog. The wall PC opens this page once a day, over the network to the floor PC. If a
+     script above failed to load (a network hiccup, the game restarting at that moment), nothing would
+     ever load it again: the walls would stay black all day (room.js or feed.js) or the ceiling a plain
+     gradient (sky.js). So: wait until the game answers again, then reload the page. Repeated failed
+     loads slow down to one try a minute, so a broken script cannot reload the page in a tight loop. */
+  (function () {
+    var failed = window.__stompFailed;
+    var KEY = 'stompRoomReloads';
+    if (!failed.length && window.StompRoom) {
+      try { sessionStorage.removeItem(KEY); } catch (err) { /* no storage: nothing to reset */ }
+      return;
+    }
+    var tries = 0;
+    try { tries = Number(sessionStorage.getItem(KEY)) || 0; } catch (err) { /* no storage */ }
+    console.error('room: ' + (failed.length ? failed.join(', ') + ' did not load' : 'room.js did not start') +
+      '; the page reloads as soon as the game answers');
+    function probe() {
+      fetch('room.js', { cache: 'no-store' }).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        try { sessionStorage.setItem(KEY, String(tries + 1)); } catch (err) { /* no storage */ }
+        location.reload();
+      }).catch(function () {
+        setTimeout(probe, 2000);
+      });
+    }
+    setTimeout(probe, tries < 5 ? 2000 : 60000);
+  })();
+</script>
+</body>
+</html>

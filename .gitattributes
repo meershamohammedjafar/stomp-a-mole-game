@@ -1,0 +1,9 @@
+# Windows batch files and the wall PC's README must keep CRLF line endings
+*.bat text eol=crlf
+wall_pc/README.txt text eol=crlf
+
+# binaries
+*.png binary
+*.jpg binary
+*.webp binary
+*.zip binary

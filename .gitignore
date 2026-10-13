@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# runtime data (today's high scores)
+stomp_the_mole/data/
+
+# full session transcripts: too big for GitHub (one is 125 MB, limit 100 MB) and they hold the
+# whole conversation; they stay on this PC only. JOURNAL.md and journal/images/ are committed.
+journal/transcripts/
+
+# personal: shows an account email (kept on the dev PC only)
+journal/images/2026-10-10_1311_edge-sync-popup-dims-game.png
