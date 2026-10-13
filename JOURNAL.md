@@ -847,6 +847,28 @@ how it is done for the formula one race"
 
 ---
 
+### 2026-10-13 ~12:30 — Input 59
+**You:** (screenshot only) The GitHub profile's activity panel, "Created 5 repositories":
+* apex-f1 (JavaScript, Oct 12) shows no "Built by";
+* **stomp-a-mole-game** (JavaScript, Oct 12) shows "Built by" with the owner's avatar plus the AI assistant's avatar;
+* the **meershamohammedjafar** profile repository (Oct 9) shows the same two avatars;
+* benze-build (private, HTML, Oct 8) shows no "Built by";
+* dubai-fitness-challenge (private, Python, Oct 7) shows "Built by" with only the AI assistant's avatar.
+
+→ [image](journal/images/2026-10-13_github-activity-built-by.png)
+
+**Done:** Checked GitHub's live data at 12:30:
+* the contributors API for `stomp-a-mole-game` lists only `meershamohammedjafar` (2 contributions);
+* the contributors API for `meershamohammedjafar/meershamohammedjafar` lists only `meershamohammedjafar` (9);
+* each repository has a single ref (`main`) at the clean commits (`ba733c0`, `f5010df`).
+
+So nothing in either repository carries the assistant any more. The "Built by" avatars in the activity panel are a stale
+snapshot that GitHub refreshes on its own schedule (usually within a day); nothing can force it from our side.
+`dubai-fitness-challenge` is a different, private project that still has the assistant as a contributor. Offered to clean it
+the same way if the owner wants.
+
+---
+
 ## Open items (kept current)
 
 * [x] Build workflow `wf_c0e33f0a-d70` finished and was verified on the dev PC (tests, visuals, window placement).
