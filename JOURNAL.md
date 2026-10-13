@@ -837,6 +837,13 @@ how it is done for the formula one race"
   * no co-author lines from now on.
 * **Profile README:** the Stomp the Mole entry now matches the APEX format. The name links to the repository, and a blank line
   follows the GIF.
+* **Results:**
+  * Game repository force-pushed: `0535bc8...358b720 main -> main (forced update)`.
+  * A fresh clone from GitHub has 1 commit, zero co-author lines, zero mentions of the assistant or its maker in any file, no notes file and no
+    email screenshot (72 files).
+  * Profile repository: commit `f5010df` "Link Stomp the Mole to its repository, like APEX" pushed. Its log and files have zero
+    traces. The live profile page shows the link and the GIF.
+* Standing rule recorded locally: no co-author lines, and never name the assistant in pushed files (this journal included).
 
 ---
 
